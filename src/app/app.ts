@@ -1,5 +1,4 @@
 import { Component, inject, signal } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -17,7 +16,6 @@ import { CnpjResponse, CnbResult, CndInfo } from './models/models';
   styleUrl: './app.css'
 })
 export class App {
-  private sanitizer = inject(DomSanitizer);
   private receitaService = inject(ReceitaService);
   private cnbService = inject(CnbService);
   private cndService = inject(CndService);
@@ -31,19 +29,6 @@ export class App {
   empresa = signal<CnpjResponse | null>(null);
   resultado = signal<CnbResult | null>(null);
   certidoes = signal<CndInfo[]>([]);
-  iframeUrl = signal<SafeResourceUrl | null>(null);
-  iframeTitle = signal('');
-
-  openIframe(url: string, titulo: string) {
-    this.iframeUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
-    this.iframeTitle.set(titulo);
-  }
-
-  closeIframe() {
-    this.iframeUrl.set(null);
-    this.iframeTitle.set('');
-  }
-
   consultar() {
     const raw = this.cnpj();
     if (!raw || raw.replace(/\D/g, '').length !== 14) {

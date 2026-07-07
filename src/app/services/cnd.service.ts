@@ -7,20 +7,19 @@ import { CndInfo } from '../models/models';
 export class CndService {
 
   consultar(cnpj: string, uf: string, municipio: string): Observable<CndInfo[]> {
-    const cnpjLimpo = (cnpj || '').replace(/\D/g, '');
     const ufLower = (uf || '').toLowerCase();
     const lista: CndInfo[] = [
       {
         tipo: 'Federal',
         orgao: 'Receita Federal / PGFN',
-        descricao: 'Certidão Conjunta de Débitos Relativos a Tributos Federais e à Dívida Ativa da União',
-        url: 'https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/servicos/certidao-conjunta-de-debitos-relativos-a-tributos-federais-e-a-divida-ativa-da-uniao',
+        descricao: 'Certidão Conjunta de Débitos (RFB + PGFN) — consultar/emitir',
+        url: 'https://servicos.receitafederal.gov.br/servico/certidoes',
         icone: 'governo',
       },
       {
         tipo: 'Estadual',
         orgao: `SEFAZ ${uf}`,
-        descricao: 'Certidão Negativa de Débitos Estaduais',
+        descricao: 'Certidão de Débitos Tributários (CDT) — emitir sem login',
         url: this.urlEstadual(ufLower),
         icone: 'governo',
       },
@@ -34,14 +33,14 @@ export class CndService {
       {
         tipo: 'FGTS',
         orgao: 'Caixa Econômica Federal',
-        descricao: 'Certidão de Regularidade do FGTS (CRF)',
-        url: 'https://www.caixa.gov.br/servicos/fgts/Paginas/default.aspx',
+        descricao: 'Certificado de Regularidade do FGTS (CRF) — emitir',
+        url: 'https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf',
         icone: 'governo',
       },
       {
         tipo: 'Correcional',
         orgao: 'Controladoria-Geral da União (CGU)',
-        descricao: 'Certidão Negativa Correcional - CEIS, CNEP, CEPIM, ePAD',
+        descricao: 'Certidão Negativa Correcional — CEIS, CNEP, CEPIM',
         url: 'https://certidoes.cgu.gov.br/',
         icone: 'governo',
       },
@@ -63,7 +62,7 @@ export class CndService {
       ma: 'https://www.sefaz.ma.gov.br',
       mt: 'https://www.sefaz.mt.gov.br',
       ms: 'https://www.sefaz.ms.gov.br',
-      mg: 'https://www.fazenda.mg.gov.br',
+      mg: 'https://www2.fazenda.mg.gov.br/sol/ctrl/SOL/CDT/SERVICO_829?ACAO=INICIAR',
       pa: 'https://www.sefaz.pa.gov.br',
       pb: 'https://www.sefaz.pb.gov.br',
       pr: 'https://www.fazenda.pr.gov.br',
