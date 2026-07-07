@@ -28,6 +28,7 @@
               "src/styles.css"
             ],
             "allowedCommonJsDependencies": [
+              "jspdf-autotable",
               "html2canvas",
               "canvg",
               "core-js",
