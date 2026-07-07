@@ -38,6 +38,20 @@
     }
 
     @if (empresa(); as emp) {
+      <section class="acoes-pdf">
+        <button (click)="gerarPdf()" [disabled]="exportando()" class="btn-pdf completo">
+          @if (exportando()) {
+            <span class="spinner"></span>
+            <span>Gerando...</span>
+          } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Relatório Completo (7 páginas)
+          }
+        </button>
+      </section>
+    }
+
+    @if (empresa(); as emp) {
         <section class="empresa-card">
           <h2>{{ emp.nome }}</h2>
           @if (emp.fantasia) {
@@ -60,15 +74,6 @@
         <section class="resultados">
           <div class="resultados-header">
             <h2>Entidades Notariais Vinculadas</h2>
-            <button (click)="gerarPdf()" [disabled]="exportando()" class="btn-pdf">
-              @if (exportando()) {
-                <span class="spinner"></span>
-                <span>Gerando...</span>
-              } @else {
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                Exportar PDF
-              }
-            </button>
           </div>
           <div class="cnb-cards">
             <article class="cnb-card nacional">
@@ -122,14 +127,14 @@
           <h2>Certidões Negativas de Débito (CND)</h2>
           <div class="cnd-grid">
             @for (c of certidoes(); track c.tipo) {
-              <a [href]="c.url" target="_blank" rel="noopener" class="cnd-card">
+              <button (click)="openIframe(c.url, c.tipo + ' - ' + c.orgao)" class="cnd-card-btn">
                 <div class="cnd-header">
                   <span class="cnd-badge">{{ c.tipo }}</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                 </div>
                 <h3>{{ c.orgao }}</h3>
                 <p>{{ c.descricao }}</p>
-              </a>
+              </button>
             }
           </div>
         </section>
@@ -143,3 +148,19 @@
     }
   </div>
 </main>
+
+@if (iframeUrl(); as url) {
+  <div class="iframe-overlay" (click)="closeIframe()">
+    <div class="iframe-modal" (click)="$event.stopPropagation()">
+      <div class="iframe-header">
+        <h3>{{ iframeTitle() }}</h3>
+        <button (click)="closeIframe()" class="iframe-close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="iframe-body">
+        <iframe [src]="url" sandbox="allow-scripts allow-forms allow-same-origin" class="cnd-iframe"></iframe>
+      </div>
+    </div>
+  </div>
+}

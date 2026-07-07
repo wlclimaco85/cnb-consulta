@@ -8,49 +8,48 @@ export class CndService {
 
   consultar(cnpj: string, uf: string, municipio: string): Observable<CndInfo[]> {
     const cnpjLimpo = (cnpj || '').replace(/\D/g, '');
-    const muniSlug = (municipio || '').toLowerCase().replace(/\s+/g, '-');
     const ufLower = (uf || '').toLowerCase();
     const lista: CndInfo[] = [
       {
         tipo: 'Federal',
         orgao: 'Receita Federal / PGFN',
         descricao: 'Certidão Conjunta de Débitos Relativos a Tributos Federais e à Dívida Ativa da União',
-        url: `https://solucoes.receita.fazenda.gov.br/Servicos/Certidao/Conjunta/Resultado?cnpj=${cnpjLimpo}`,
+        url: 'https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/servicos/certidao-conjunta-de-debitos-relativos-a-tributos-federais-e-a-divida-ativa-da-uniao',
         icone: 'governo',
       },
       {
         tipo: 'Estadual',
         orgao: `SEFAZ ${uf}`,
         descricao: 'Certidão Negativa de Débitos Estaduais',
-        url: this.urlEstadual(ufLower, cnpjLimpo),
-        icone: 'governo',
-      },
-      {
-        tipo: 'Municipal',
-        orgao: `SEFAZ ${municipio}/${uf}`,
-        descricao: 'Certidão Negativa de Débitos Municipais (ISS)',
-        url: this.urlMunicipal(ufLower, muniSlug, cnpjLimpo),
+        url: this.urlEstadual(ufLower),
         icone: 'governo',
       },
       {
         tipo: 'Trabalhista',
         orgao: 'Tribunal Superior do Trabalho (TST)',
         descricao: 'Certidão Negativa de Débitos Trabalhistas (CNDT)',
-        url: `https://wwwh.tst.jus.br/web/cejud/certidao?cnpj=${cnpjLimpo}`,
+        url: 'https://www.tst.jus.br/certidao',
         icone: 'governo',
       },
       {
         tipo: 'FGTS',
         orgao: 'Caixa Econômica Federal',
         descricao: 'Certidão de Regularidade do FGTS (CRF)',
-        url: `https://consulta-crf.caixa.gov.br/consultacrf/pages/consultaEmpregador.jsf?cnpj=${cnpjLimpo}`,
+        url: 'https://www.caixa.gov.br/servicos/fgts/Paginas/default.aspx',
+        icone: 'governo',
+      },
+      {
+        tipo: 'Correcional',
+        orgao: 'Controladoria-Geral da União (CGU)',
+        descricao: 'Certidão Negativa Correcional - CEIS, CNEP, CEPIM, ePAD',
+        url: 'https://certidoes.cgu.gov.br/',
         icone: 'governo',
       },
     ];
     return of(lista).pipe(delay(0));
   }
 
-  private urlEstadual(uf: string, cnpj: string): string {
+  private urlEstadual(uf: string): string {
     const urls: Record<string, string> = {
       ac: 'https://www.sefaz.ac.gov.br',
       al: 'https://certidao.sefaz.al.gov.br',
@@ -64,7 +63,7 @@ export class CndService {
       ma: 'https://www.sefaz.ma.gov.br',
       mt: 'https://www.sefaz.mt.gov.br',
       ms: 'https://www.sefaz.ms.gov.br',
-      mg: 'https://www.sefaz.mg.gov.br',
+      mg: 'https://www.fazenda.mg.gov.br',
       pa: 'https://www.sefaz.pa.gov.br',
       pb: 'https://www.sefaz.pb.gov.br',
       pr: 'https://www.fazenda.pr.gov.br',
@@ -76,14 +75,10 @@ export class CndService {
       ro: 'https://www.sefaz.ro.gov.br',
       rr: 'https://www.sefaz.rr.gov.br',
       sc: 'https://www.sefaz.sc.gov.br',
-      sp: `https://www.certidoes.fazenda.sp.gov.br/certidao/Inicio.aspx?cnpj=${cnpj}`,
+      sp: 'https://www.certidoes.fazenda.sp.gov.br',
       se: 'https://www.sefaz.se.gov.br',
       to: 'https://www.sefaz.to.gov.br',
     };
     return urls[uf] || `https://www.sefaz.${uf}.gov.br`;
-  }
-
-  private urlMunicipal(uf: string, muniSlug: string, cnpj: string): string {
-    return `https://www.google.com/search?q=CND+municipal+ISS+${muniSlug}+${uf}+${cnpj}`;
   }
 }
