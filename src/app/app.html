@@ -1,0 +1,147 @@
+<main>
+  <div class="container">
+    <header>
+      <h1>CNB Consulta</h1>
+      <p class="subtitle">Consulte as entidades notariais vinculadas a um CNPJ</p>
+    </header>
+
+    <section class="search-box">
+      <div class="input-group">
+        <input
+          type="text"
+          [ngModel]="cnpj()"
+          (ngModelChange)="mascaraCnpj($event)"
+          (keyup.enter)="consultar()"
+          placeholder="Digite o CNPJ (apenas números)"
+          maxlength="18"
+          class="input-cnpj"
+          autofocus
+        />
+        <button (click)="consultar()" [disabled]="loading()" class="btn-consultar">
+          @if (loading()) {
+            <span class="spinner"></span>
+          } @else {
+            Consultar
+          }
+        </button>
+      </div>
+      @if (error()) {
+        <div class="error">{{ error() }}</div>
+      }
+    </section>
+
+    <div #relatorio>
+      @if (empresa(); as emp) {
+        <section class="empresa-card">
+          <h2>{{ emp.nome }}</h2>
+          @if (emp.fantasia) {
+            <p class="fantasia">{{ emp.fantasia }}</p>
+          }
+          <div class="info-grid">
+            <div><strong>CNPJ</strong><span>{{ emp.cnpj }}</span></div>
+            <div><strong>Situação</strong><span class="tag ativa">{{ emp.situacao }}</span></div>
+            <div><strong>Inscrição Estadual</strong><span>{{ emp.inscricao_estadual || '—' }}</span></div>
+            <div><strong>UF</strong><span>{{ emp.uf }}</span></div>
+            <div><strong>Município</strong><span>{{ emp.municipio }}</span></div>
+            <div><strong>Endereço</strong><span>{{ emp.logradouro }}, {{ emp.numero }}{{ emp.complemento ? ' - ' + emp.complemento : '' }} - {{ emp.bairro }}</span></div>
+            <div><strong>Telefone</strong><span>{{ emp.telefone }}</span></div>
+            <div><strong>E-mail</strong><span>{{ emp.email }}</span></div>
+          </div>
+        </section>
+      }
+
+      @if (loading() && empresa()) {
+        <section class="loading-cnb">
+          <span class="spinner"></span>
+          <span>Consultando dados...</span>
+        </section>
+      }
+
+      @if (resultado(); as res) {
+        <section class="resultados">
+          <div class="resultados-header">
+            <h2>Entidades Notariais Vinculadas</h2>
+            <button (click)="gerarPdf()" [disabled]="exportando()" class="btn-pdf">
+              @if (exportando()) {
+                <span class="spinner"></span>
+                <span>Gerando...</span>
+              } @else {
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Exportar PDF
+              }
+            </button>
+          </div>
+          <div class="cnb-cards">
+            <article class="cnb-card nacional">
+              <div class="card-header">
+                <span class="badge">Nacional</span>
+                <span class="sigla">{{ res.nacional.sigla }}</span>
+              </div>
+              <h3>{{ res.nacional.entidade }}</h3>
+              <p>{{ res.nacional.descricao }}</p>
+              <div class="card-footer">
+                <a [href]="res.nacional.website" target="_blank" rel="noopener">{{ res.nacional.website }}</a>
+                <span class="associados">{{ res.nacional.associados }} associados</span>
+              </div>
+            </article>
+
+            @if (res.estadual) {
+              <article class="cnb-card estadual">
+                <div class="card-header">
+                  <span class="badge">Estadual</span>
+                  <span class="sigla">{{ res.estadual.sigla }}</span>
+                </div>
+                <h3>{{ res.estadual.entidade }}</h3>
+                <p>{{ res.estadual.descricao }}</p>
+                <div class="card-footer">
+                  <a [href]="res.estadual.website" target="_blank" rel="noopener">{{ res.estadual.website }}</a>
+                  <span class="associados">{{ res.estadual.associados }} associados</span>
+                </div>
+              </article>
+            }
+
+            @if (res.municipal) {
+              <article class="cnb-card municipal">
+                <div class="card-header">
+                  <span class="badge">Municipal</span>
+                  <span class="sigla">{{ res.municipal.sigla }}</span>
+                </div>
+                <h3>{{ res.municipal.entidade }}</h3>
+                <p>{{ res.municipal.descricao }}</p>
+                <div class="card-footer">
+                  <a [href]="res.municipal.website" target="_blank" rel="noopener">{{ res.municipal.website }}</a>
+                  <span class="associados">{{ res.municipal.associados }} associados</span>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
+      @if (certidoes().length > 0) {
+        <section class="resultados">
+          <h2>Certidões Negativas de Débito (CND)</h2>
+          <div class="cnd-grid">
+            @for (c of certidoes(); track c.tipo) {
+              <a [href]="c.url" target="_blank" rel="noopener" class="cnd-card">
+                <div class="cnd-header">
+                  <span class="cnd-badge">{{ c.tipo }}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </div>
+                <h3>{{ c.orgao }}</h3>
+                <p>{{ c.descricao }}</p>
+              </a>
+            }
+          </div>
+        </section>
+      }
+    </div>
+
+    @if (!empresa() && !resultado() && !error() && !loading()) {
+      <section class="empty-state">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#475569"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <p>Digite um CNPJ para consultar as entidades notariais vinculadas</p>
+      </section>
+    }
+  </div>
+</main>
