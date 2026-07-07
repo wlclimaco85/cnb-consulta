@@ -7,9 +7,9 @@ import { CndInfo } from '../models/models';
 export class CndService {
 
   consultar(cnpj: string, uf: string, municipio: string): Observable<CndInfo[]> {
-    const cnpjLimpo = cnpj.replace(/\D/g, '');
-    const muniSlug = municipio.toLowerCase().replace(/\s+/g, '-');
-    const ufLower = uf.toLowerCase();
+    const cnpjLimpo = (cnpj || '').replace(/\D/g, '');
+    const muniSlug = (municipio || '').toLowerCase().replace(/\s+/g, '-');
+    const ufLower = (uf || '').toLowerCase();
     const lista: CndInfo[] = [
       {
         tipo: 'Federal',
