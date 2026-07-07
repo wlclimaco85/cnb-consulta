@@ -30,6 +30,13 @@
       }
     </section>
 
+    @if (statusMsg()) {
+      <section class="loading-cnb">
+        <span class="spinner"></span>
+        <span>{{ statusMsg() }}</span>
+      </section>
+    }
+
     @if (empresa(); as emp) {
         <section class="empresa-card">
           <h2>{{ emp.nome }}</h2>
@@ -46,13 +53,6 @@
             <div><strong>Telefone</strong><span>{{ emp.telefone }}</span></div>
             <div><strong>E-mail</strong><span>{{ emp.email }}</span></div>
           </div>
-        </section>
-      }
-
-      @if (loading() && empresa()) {
-        <section class="loading-cnb">
-          <span class="spinner"></span>
-          <span>Consultando dados...</span>
         </section>
       }
 

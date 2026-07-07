@@ -21,6 +21,7 @@ export class App {
 
   cnpj = signal('');
   loading = signal(false);
+  statusMsg = signal('');
   exportando = signal(false);
   error = signal('');
   empresa = signal<CnpjResponse | null>(null);
@@ -34,6 +35,7 @@ export class App {
       return;
     }
     this.loading.set(true);
+    this.statusMsg.set('Consultando CNPJ...');
     this.error.set('');
     this.empresa.set(null);
     this.resultado.set(null);
@@ -44,21 +46,39 @@ export class App {
         if (!emp) {
           this.error.set('CNPJ inválido');
           this.loading.set(false);
+          this.statusMsg.set('');
           return;
         }
         this.empresa.set(emp);
+        this.statusMsg.set('Consultando CNBs...');
+
+        let pendente = 2;
+
         this.cnbService.consultar(emp.uf, emp.municipio).subscribe({
-          next: (res) => this.resultado.set(res),
-          error: () => this.resultado.set(null)
+          next: (res) => {
+            this.resultado.set(res);
+            this.statusMsg.set('Consultando CNDs...');
+            if (--pendente === 0) { this.loading.set(false); this.statusMsg.set(''); }
+          },
+          error: () => {
+            if (--pendente === 0) { this.loading.set(false); this.statusMsg.set(''); }
+          }
         });
+
         this.cndService.consultar(emp.cnpj, emp.uf, emp.municipio).subscribe({
-          next: (lista) => this.certidoes.set(lista),
+          next: (lista) => {
+            this.certidoes.set(lista);
+            if (--pendente === 0) { this.loading.set(false); this.statusMsg.set(''); }
+          },
+          error: () => {
+            if (--pendente === 0) { this.loading.set(false); this.statusMsg.set(''); }
+          }
         });
-        this.loading.set(false);
       },
       error: (err) => {
         this.error.set('Erro: ' + (err.message || err));
         this.loading.set(false);
+        this.statusMsg.set('');
       }
     });
   }
