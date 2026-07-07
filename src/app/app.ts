@@ -5,6 +5,7 @@ import autoTable from 'jspdf-autotable';
 import { ReceitaService } from './services/receita.service';
 import { CnbService } from './services/cnb.service';
 import { CndService } from './services/cnd.service';
+import { CertificadoPdfService } from './services/certificado-pdf.service';
 import { CnpjResponse, CnbResult, CndInfo } from './models/models';
 
 @Component({
@@ -18,6 +19,7 @@ export class App {
   private receitaService = inject(ReceitaService);
   private cnbService = inject(CnbService);
   private cndService = inject(CndService);
+  private certPdf = inject(CertificadoPdfService);
 
   cnpj = signal('');
   loading = signal(false);
@@ -204,7 +206,7 @@ export class App {
         y = (pdf as any).lastAutoTable.finalY + 10;
       }
 
-      // === RODAPÉ ===
+      // === RODAPÉ da página de resumo ===
       if (y > pageH - 25) pdf.addPage();
       const footerY = pageH - 15;
       pdf.setDrawColor(...corPrimaria);
@@ -214,6 +216,9 @@ export class App {
       pdf.setTextColor(...corCinza);
       pdf.text(`Relatório gerado em ${hoje} via CNB Consulta`, margin, footerY + 3);
       pdf.text(`CNPJ: ${emp.cnpj}`, pageW - margin - pdf.getTextWidth(`CNPJ: ${emp.cnpj}`), footerY + 3);
+
+      // === CERTIFICADOS OFICIAIS (6 páginas) ===
+      this.certPdf.gerarCertificados(pdf, emp);
 
       const nomeArquivo = emp.nome.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 40);
       pdf.save(`RELATORIO_CNB_CND_${nomeArquivo}.pdf`);
